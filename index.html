@@ -15,18 +15,35 @@
                 <h1>זורעים שנה</h1>
                 <p>שנה חדשה היא מרחב אדמה המחכה להיזרע. <br>בחרו את הזרע שתרצו לטמון השנה במרחב החינוכי שלכם:</p>
             </header>
-            <div class="seeds-grid" id="seeds-container">
-                <!-- הזרעים יוכנסו כאן דרך JS -->
-            </div>
+            <div class="seeds-grid" id="seeds-container"></div>
         </section>
 
-        <!-- מסך 2: השקיה והכוונה -->
+        <!-- מסך 2: השקיה והכוונה עם בחירת סגנון -->
         <section id="screen-2" class="screen hidden">
             <div class="content-wrapper">
                 <h2>השקיית הזרע</h2>
                 <p>בחרת לזרוע <strong><span id="selected-seed-name"></span></strong>.</p>
-                <p>כדי שהזרע ינבוט, תארו רגע אחד עתידי בכיתה, בחדר המורים או בבית הספר שבו נראה את הזרע הזה פורח. אילו צבעים, קולות או תחושות יהיו שם?</p>
+                <p>כדי שהזרע ינבוט, תארו רגע עתידי בבית הספר שבו נראה את הזרע הזה פורח. אילו תחושות יהיו שם?</p>
                 <textarea id="user-prompt" placeholder="למשל: תלמידים יושבים במעגל בבוקר שטוף שמש, מקשיבים אחד לשני בחיוך..."></textarea>
+                
+                <div class="style-selector">
+                    <h3>בחרו את סגנון הגלויה שלכם:</h3>
+                    <div class="style-options">
+                        <label class="style-option">
+                            <input type="radio" name="art-style" value="watercolor" checked>
+                            <span class="style-btn">צבעי מים רכים</span>
+                        </label>
+                        <label class="style-option">
+                            <input type="radio" name="art-style" value="botanical">
+                            <span class="style-btn">איור בוטני</span>
+                        </label>
+                        <label class="style-option">
+                            <input type="radio" name="art-style" value="3d-clay">
+                            <span class="style-btn">תלת-ממד</span>
+                        </label>
+                    </div>
+                </div>
+
                 <button id="water-btn" class="primary-btn">להשקות את הזרע 💧</button>
             </div>
         </section>
