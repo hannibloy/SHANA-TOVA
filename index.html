@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>זורעים שנה - צידה לדרך</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- מסך 1: בחירת זרע -->
+        <section id="screen-1" class="screen active">
+            <header>
+                <h1>זורעים שנה</h1>
+                <p>שנה חדשה היא מרחב אדמה המחכה להיזרע. <br>בחרו את הזרע שתרצו לטמון השנה במרחב החינוכי שלכם:</p>
+            </header>
+            <div class="seeds-grid" id="seeds-container">
+                <!-- הזרעים יוכנסו כאן דרך JS -->
+            </div>
+        </section>
+
+        <!-- מסך 2: השקיה והכוונה -->
+        <section id="screen-2" class="screen hidden">
+            <div class="content-wrapper">
+                <h2>השקיית הזרע</h2>
+                <p>בחרת לזרוע <strong><span id="selected-seed-name"></span></strong>.</p>
+                <p>כדי שהזרע ינבוט, תארו רגע אחד עתידי בכיתה, בחדר המורים או בבית הספר שבו נראה את הזרע הזה פורח. אילו צבעים, קולות או תחושות יהיו שם?</p>
+                <textarea id="user-prompt" placeholder="למשל: תלמידים יושבים במעגל בבוקר שטוף שמש, מקשיבים אחד לשני בחיוך..."></textarea>
+                <button id="water-btn" class="primary-btn">להשקות את הזרע 💧</button>
+            </div>
+        </section>
+
+        <!-- מסך טעינה: אנימציית צמיחה -->
+        <section id="screen-loading" class="screen hidden">
+            <div class="loading-container">
+                <div class="plant-animation">
+                    <span id="plant-stage">🌱</span>
+                </div>
+                <h3>הזרע שלך מצמיח שורשים...</h3>
+                <p>הבינה המלאכותית מציירת את החזון שלך.</p>
+            </div>
+        </section>
+
+        <!-- מסך 3: תוצאה -->
+        <section id="screen-3" class="screen hidden">
+            <div class="result-card">
+                <h2>הצידה שלך לדרך מוכנה!</h2>
+                <p class="seed-title">שנה של <span id="final-seed-name"></span></p>
+                <div class="image-container">
+                    <img id="generated-image" src="" alt="החזון שלך לשנה החדשה">
+                </div>
+                <p class="user-vision" id="final-vision"></p>
+                <div class="actions">
+                    <button id="restart-btn" class="secondary-btn">לזרוע זרע חדש</button>
+                    <button class="primary-btn" onclick="window.print()">להדפסת הגלויה</button>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
