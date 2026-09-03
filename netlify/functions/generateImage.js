@@ -1,62 +1,73 @@
 exports.handler = async function(event, context) {
-    // מוודאים שהבקשה נשלחה בצורה תקינה
-    if (event.httpMethod !== 'POST') {
-        return { statusCode: 405, body: 'Method Not Allowed' };
+    // הגדרות אבטחה בסיסיות (CORS)
+    const headers = {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Methods": "POST, OPTIONS"
+    };
+
+    if (event.httpMethod === "OPTIONS") {
+        return { statusCode: 200, headers, body: "OK" };
     }
 
     try {
-        // שולפים את הנתונים שהמשתמש שלח מהאפליקציה
-        const { seedName, userText, style } = JSON.parse(event.body);
+        // 1. קבלת הנתונים שהמשתתפת הזינה באפליקציה (הזרע, הטקסט, והסגנון)
+        const body = JSON.parse(event.body);
+        const { seedName, userText, style } = body;
         
-        // שולפים את המפתח הסודי שהטמנת ב-Netlify
-        const API_KEY = process.env.GOOGLE_API_KEY;
+        // 2. שליפת המפתח הסודי מ-Netlify
+        const apiKey = process.env.API_KEY; 
 
-        if (!API_KEY) {
-            throw new Error("מפתח ה-API חסר בשרת.");
+        if (!apiKey) {
+            return { 
+                statusCode: 500, 
+                headers,
+                body: JSON.stringify({ success: false, error: "Missing API Key in Netlify" }) 
+            };
         }
 
-        // הגדרת סגנונות העיצוב עבור הבינה המלאכותית
-        const stylePrompts = {
-            'watercolor': 'Create a beautiful, minimalist watercolor illustration, soft pastel colors, cream background, delicate brush strokes.',
-            'botanical': 'Create a clean, minimalist botanical line-art illustration, subtle natural colors, elegant and simple.',
-            '3d-clay': 'Create a soft, 3D claymation Pixar-style illustration, warm lighting, smooth textures, cute and inviting.'
-        };
+        // 3. בניית ה"פרומפט" הפדגוגי המדויק לבינה המלאכותית
+        const aiPrompt = `A ${style} style illustration of: ${userText}. The central pedagogical theme is the value of ${seedName}. Soft pastel colors, minimalist watercolor aesthetics, inspiring and therapeutic atmosphere, safe space, clean background.`;
 
-        const selectedStylePrompt = stylePrompts[style] || stylePrompts['watercolor'];
-        
-        // הפרומפט המלא שנשלח ל-AI
-        const fullPrompt = `${selectedStylePrompt} The core educational theme is '${seedName}'. Specific scene details: ${userText}`;
-
-        /* 
-        =========================================================
-        כאן תתבצע הקריאה האמיתית ל-API של גוגל (Imagen / Vertex AI).
-        מכיוון שקריאות יצירת תמונה משתנות מעט בהתאם לסוג החשבון שלך, 
-        השארתי כאן את המבנה המוכן. כרגע זה מחזיר תמונות דמה לפי הסגנון, 
-        כדי שתוכלי לבדוק שהמערכת עובדת, לפני חיבור סופי לחיוב של גוגל.
-        =========================================================
-        */
-
-        let dummyImageUrl = "";
-        if (style === 'watercolor') dummyImageUrl = "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MTI2OTd8MHwxfHNlYXJjaHwyfHx3YXRlcmNvbG9yJTIwcGxhbnR8ZW58MHx8fHwxNzA5NjM4ODc0fDA&ixlib=rb-4.0.3&q=80&w=800";
-        if (style === 'botanical') dummyImageUrl = "https://images.unsplash.com/photo-1611078816578-872fdb611e3b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MTI2OTd8MHwxfHNlYXJjaHwzfHxib3RhbmljYWwlMjBpbGx1c3RyYXRpb258ZW58MHx8fHwxNzA5NjQxMjM0fDA&ixlib=rb-4.0.3&q=80&w=800";
-        if (style === '3d-clay') dummyImageUrl = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w1MTI2OTd8MHwxfHNlYXJjaHwyfHwzZCUyMGFydHxlbnwwfHx8fDE3MDk2NDEyNTV8MA&ixlib=rb-4.0.3&q=80&w=800";
-
-        // החזרת התשובה לאפליקציה (בהמשך נחליף את ה-dummy בכתובת שגוגל תחזיר)
-        return {
-            statusCode: 200,
+        // 4. הקריאה לבינה המלאכותית (הקוד כאן מותאם ל-OpenAI DALL-E, הסטנדרט הנפוץ ביותר)
+        const response = await fetch('https://api.openai.com/v1/images/generations', {
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json"
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
             },
-            body: JSON.stringify({ 
-                imageUrl: dummyImageUrl,
-                success: true
+            body: JSON.stringify({
+                model: "dall-e-3", // מודל יצירת התמונות
+                prompt: aiPrompt,
+                n: 1,
+                size: "1024x1024"
             })
-        };
+        });
+
+        const data = await response.json();
+
+        // 5. החזרת התמונה האמיתית לאפליקציה שלך
+        if (data.data && data.data[0]) {
+            return {
+                statusCode: 200,
+                headers,
+                body: JSON.stringify({ success: true, imageUrl: data.data[0].url })
+            };
+        } else {
+            console.error("AI API Error:", data);
+            return {
+                statusCode: 500,
+                headers,
+                body: JSON.stringify({ success: false, error: "שגיאה ביצירת התמונה" })
+            };
+        }
 
     } catch (error) {
-        return { 
-            statusCode: 500, 
-            body: JSON.stringify({ error: error.message, success: false }) 
+        console.error("Server Error:", error);
+        return {
+            statusCode: 500,
+            headers,
+            body: JSON.stringify({ success: false, error: error.message })
         };
     }
 };
