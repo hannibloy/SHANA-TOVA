@@ -1,76 +1,73 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
+<!-- גרסת עיצוב: גלויה פרחונית וזהב v2 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>זורעים שנה - צידה לדרך</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- כפתור הנחיות למנחה (דיסקרטי) -->
+    <button id="guide-btn" class="guide-toggle-btn">הנחיות למנחה ✦</button>
+
+    <!-- מודל (פופ-אפ) הנחיות -->
+    <div id="guide-modal" class="modal hidden">
+        <div class="modal-content">
+            <span id="close-modal" class="close-btn">&times;</span>
+            <h2>מערך הנחיה: הגנן והגינה</h2>
+            <div class="modal-text">
+                <p><strong>רציונל פדגוגי (מודל המשאבים):</strong> רגע לפני ההזנה של האחר, עלינו לזהות את משאבי ההתמודדות שחסרים לנו ולהטעין אותם.</p>
+                <p><strong>מהלך המפגש (15 דקות):</strong></p>
+                <ol>
+                    <li><strong>התקרקעות (3 דק'):</strong> בקשו מהצוות לעצום עיניים ולשאול פנימה: "איזה כוח התרוקן בי השנה ודורש מילוי?"</li>
+                    <li><strong>יצירה דיגיטלית (7 דק'):</strong> המשתתפים בוחרים את ה"זרע" שלהם באפליקציה ומייצרים את חזון הצמיחה.</li>
+                    <li><strong>אסיף משותף (5 דק'):</strong> העלאת התוצרים ללוח שיתופי ליצירת חוויית לכידות ושייכות (SDT).</li>
+                </ol>
+            </div>
+            <a href="https://padlet.com/" target="_blank" class="padlet-btn">לפתיחת לוח Padlet שיתופי</a>
+        </div>
+    </div>
+
     <div class="app-container">
-        <!-- מסך 1: בחירת זרע -->
+        <!-- מסך 1: פתיחה ובחירת זרע -->
         <section id="screen-1" class="screen active">
             <header>
                 <h1>זורעים שנה</h1>
-                <p>שנה חדשה היא מרחב אדמה המחכה להיזרע. <br>בחרו את הזרע שתרצו לטמון השנה במרחב החינוכי שלכם:</p>
+                <p>שנת הלימודים בפתח, והמרחב החינוכי הוא הגינה שלך.<br>
+                כגננת של המרחב הזה – אילו כוחות ו'זרעים' תצטרכי כדי לצמוח בעצמך, ולהצמיח את הסובבים אותך?</p>
             </header>
             <div class="seeds-grid" id="seeds-container"></div>
         </section>
 
-        <!-- מסך 2: השקיה והכוונה עם בחירת סגנון -->
+        <!-- מסך 2: השקיה (המשגה) -->
         <section id="screen-2" class="screen hidden">
             <div class="content-wrapper">
-                <h2>השקיית הזרע</h2>
-                <p>בחרת לזרוע <strong><span id="selected-seed-name"></span></strong>.</p>
-                <p>כדי שהזרע ינבוט, תארו רגע עתידי בבית הספר שבו נראה את הזרע הזה פורח. אילו תחושות יהיו שם?</p>
-                <textarea id="user-prompt" placeholder="למשל: תלמידים יושבים במעגל בבוקר שטוף שמש, מקשיבים אחד לשני בחיוך..."></textarea>
-                
-                <div class="style-selector">
-                    <h3>בחרו את סגנון הגלויה שלכם:</h3>
-                    <div class="style-options">
-                        <label class="style-option">
-                            <input type="radio" name="art-style" value="watercolor" checked>
-                            <span class="style-btn">צבעי מים רכים</span>
-                        </label>
-                        <label class="style-option">
-                            <input type="radio" name="art-style" value="botanical">
-                            <span class="style-btn">איור בוטני</span>
-                        </label>
-                        <label class="style-option">
-                            <input type="radio" name="art-style" value="3d-clay">
-                            <span class="style-btn">תלת-ממד</span>
-                        </label>
-                    </div>
-                </div>
-
-                <button id="water-btn" class="primary-btn">להשקות את הזרע 💧</button>
+                <h2>להשקות את הזרע</h2>
+                <p>בחרת בזרע של <strong><span id="selected-seed-name"></span></strong>.</p>
+                <p>כדי שהוא יפרח בתוכך ויוקרן החוצה לתלמידים, תארו בקצרה רגע עתידי של צמיחה במרחב שלכם:</p>
+                <textarea id="user-prompt" placeholder="למשל: בוקר רגוע בכיתה, אני מצליחה להקשיב בסבלנות..."></textarea>
+                <button id="water-btn" class="primary-btn">להצמיח את הצידה לדרך 🌿</button>
             </div>
         </section>
 
-        <!-- מסך טעינה: אנימציית צמיחה -->
-        <section id="screen-loading" class="screen hidden">
-            <div class="loading-container">
-                <div class="plant-animation">
-                    <span id="plant-stage">🌱</span>
-                </div>
-                <h3>הזרע שלך מצמיח שורשים...</h3>
-                <p>הבינה המלאכותית מציירת את החזון שלך.</p>
-            </div>
-        </section>
-
-        <!-- מסך 3: תוצאה -->
+        <!-- מסך 3: תוצר סופי משולב בגלויה -->
         <section id="screen-3" class="screen hidden">
             <div class="result-card">
-                <h2>הצידה שלך לדרך מוכנה!</h2>
-                <p class="seed-title">שנה של <span id="final-seed-name"></span></p>
-                <div class="image-container">
-                    <img id="generated-image" src="" alt="החזון שלך לשנה החדשה">
+                <div class="postcard-wrapper">
+                    <!-- הגלויה המעוצבת שהעלית תשמש כרקע -->
+                    <img src="https://i.postimg.cc/zfvB5V4Y/image.jpg" class="background-postcard" alt="שנה טובה">
+                    
+                    <div class="postcard-content">
+                        <h3>הצידה שלך: <span id="final-seed-name"></span></h3>
+                        <p class="user-vision" id="final-vision"></p>
+                    </div>
                 </div>
-                <p class="user-vision" id="final-vision"></p>
+                
                 <div class="actions">
-                    <button id="restart-btn" class="secondary-btn">לזרוע זרע חדש</button>
-                    <button class="primary-btn" onclick="window.print()">להדפסת הגלויה</button>
+                    <button id="restart-btn" class="secondary-btn">ליצירה נוספת</button>
+                    <button class="primary-btn" onclick="window.print()">להדפסה / שמירה</button>
                 </div>
             </div>
         </section>
