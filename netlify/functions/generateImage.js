@@ -1,5 +1,4 @@
 exports.handler = async function(event, context) {
-    // הגדרות אבטחה בסיסיות (CORS)
     const headers = {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Headers": "Content-Type",
@@ -11,55 +10,51 @@ exports.handler = async function(event, context) {
     }
 
     try {
-        // 1. קבלת הנתונים שהמשתתפת הזינה באפליקציה (הזרע, הטקסט, והסגנון)
         const body = JSON.parse(event.body);
         const { seedName, userText, style } = body;
         
-        // 2. שליפת המפתח הסודי מ-Netlify
+        // שליפת המפתח של Gemini מתוך Netlify
         const apiKey = process.env.API_KEY; 
 
         if (!apiKey) {
-            return { 
-                statusCode: 500, 
-                headers,
-                body: JSON.stringify({ success: false, error: "Missing API Key in Netlify" }) 
-            };
+            throw new Error("חסר מפתח API של Gemini במערכת");
         }
 
-        // 3. בניית ה"פרומפט" הפדגוגי המדויק לבינה המלאכותית
-        const aiPrompt = `A ${style} style illustration of: ${userText}. The central pedagogical theme is the value of ${seedName}. Soft pastel colors, minimalist watercolor aesthetics, inspiring and therapeutic atmosphere, safe space, clean background.`;
+        // בניית הפרומפט המדויק שיתורגם לציור בצבעי מים רכים
+        const aiPrompt = `A minimalist watercolor illustration of: ${userText}. The visual concept represents ${seedName}. Soft pastel colors, gentle brush strokes, warm and inspiring atmosphere, purely aesthetic, empty cream background. No text in the image.`;
 
-        // 4. הקריאה לבינה המלאכותית (הקוד כאן מותאם ל-OpenAI DALL-E, הסטנדרט הנפוץ ביותר)
-        const response = await fetch('https://api.openai.com/v1/images/generations', {
+        // קריאה מאובטחת לשרת יצירת התמונות של Google (Gemini/Imagen)
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-001:predict?key=${apiKey}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
             },
             body: JSON.stringify({
-                model: "dall-e-3", // מודל יצירת התמונות
-                prompt: aiPrompt,
-                n: 1,
-                size: "1024x1024"
+                instances: [
+                    { prompt: aiPrompt }
+                ],
+                parameters: {
+                    sampleCount: 1,
+                    aspectRatio: "1:1"
+                }
             })
         });
 
         const data = await response.json();
 
-        // 5. החזרת התמונה האמיתית לאפליקציה שלך
-        if (data.data && data.data[0]) {
+        // המרת התמונה שחוזרת מגוגל לפורמט שהאתר יכול להציג מיד
+        if (data.predictions && data.predictions[0]) {
+            const imageBase64 = data.predictions[0].bytesBase64Encoded;
+            const imageUrl = `data:image/png;base64,${imageBase64}`;
+            
             return {
                 statusCode: 200,
                 headers,
-                body: JSON.stringify({ success: true, imageUrl: data.data[0].url })
+                body: JSON.stringify({ success: true, imageUrl: imageUrl })
             };
         } else {
-            console.error("AI API Error:", data);
-            return {
-                statusCode: 500,
-                headers,
-                body: JSON.stringify({ success: false, error: "שגיאה ביצירת התמונה" })
-            };
+            console.error("Gemini API Error:", data);
+            throw new Error("הבינה המלאכותית לא הצליחה לחולל תמונה מהתיאור הזה.");
         }
 
     } catch (error) {
